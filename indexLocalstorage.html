@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <title>Hello, world!</title>
+  </head>
+  <body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2 mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        Todo List
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="item" placeholder="Input Item">
+                            <input type="hidden" id="updateId">
+                            <div class="input-group-prepend" id="saveItem">
+                                <button onclick="storeItem()" class="btn btn-outline-success">Add TodoList</button>
+                            </div>
+                            <div class="input-group-prepend" id="updateItem" style="display: none;">
+                                <button onclick="updateItem()" class="btn btn-outline-success">Update TodoList</button>
+                            </div>
+                        </div>
+                        <small id="errorMsg" class="form-text text-danger"></small>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-striped" id="todoListTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
+    <script type="text/javascript">
+        showTodo();
+        // var selectedItem = document.querySelector(".selected-item");
+        // selectedItem.addEventListener('click', function(e){
+        //     var i;
+        //     for(i=0; i<selectedItem.langth; i++){
+        //         selectedItem[i].style.background = "#000"
+                
+        //     }
+        // })
+        function storeItem(){
+            var item = document.getElementById('item').value;
+            if(item != ""){
+                var todoList = localStorage.getItem('todo_list');
+                if(todoList == null){
+                    todoObj = []
+                }
+                else{
+                    todoObj = JSON.parse(todoList);
+                }
+                todoObj.push(item);
+                localStorage.setItem('todo_list', JSON.stringify(todoObj))
+                showTodo();
+                document.getElementById('item').value = "";
+            }
+            else{
+                document.getElementById("errorMsg").innerHTML = "Please fill out the input box"
+            }
+            
+        }
+
+        function showTodo(){
+            var todoListTable =document.getElementById('todoListTable');
+
+            var todoList = localStorage.getItem('todo_list');
+            if(todoList == null){
+                todoObj = []
+            }
+            else{
+                todoObj = JSON.parse(todoList);
+            }
+            var html = "";
+            todoObj.forEach((todoItem,index) =>{
+                html += `<tr>
+                            <td>${index+1}</td>
+                            <td><span class="selected-item">${todoItem}</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-info" onclick="editItem(${index})">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(${index})">Delete</button>
+                                </div>
+                            </td>
+                        </tr>`
+            })
+            todoListTable.innerHTML = html;
+        }
+        function editItem(index){
+            var updateId = document.getElementById('updateId'),
+                saveItem = document.getElementById('saveItem'),
+                updateItem = document.getElementById('updateItem'),
+                todoList = localStorage.getItem('todo_list'),
+                todoObj = JSON.parse(todoList);
+
+            item.value = todoObj[index];
+            saveItem.style.display = "none";
+            updateItem.style.display = "block";
+            updateId.value = index
+        }
+
+        function updateItem(){
+            var saveItem = document.getElementById('saveItem'),
+                updateItem = document.getElementById('updateItem'),
+                updateId = document.getElementById('updateId').value,
+                todoList = localStorage.getItem('todo_list');
+
+            todoObj = JSON.parse(todoList);
+            todoObj[updateId] = item.value;
+            localStorage.setItem('todo_list', JSON.stringify(todoObj))
+            //alert(updateId)
+            saveItem.style.display = "block";
+            updateItem.style.display = "none";
+            showTodo();
+            document.getElementById('item').value = "";
+        }
+
+        function deleteItem(index){
+            var todoList = localStorage.getItem('todo_list');
+            todoObj = JSON.parse(todoList);
+            todoObj.splice(index,1);
+            localStorage.setItem('todo_list', JSON.stringify(todoObj));
+            showTodo();
+        }
+
+        // var todoMarkBtn = document.getElementById('todoMark');
+        // todoMarkBtn.addEventListener("click",function(){
+        //     alert('click')
+        // })
+        
+        
+    </script>
+  </body>
+</html>
