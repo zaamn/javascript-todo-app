@@ -9,27 +9,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
     <title>Hello, world!</title>
-    <style>
-        .close{
-            cursor: pointer;
-        }
-        ul#todoList {
-            list-style: none;
-            margin: 0px;
-            padding: 0;
-        }
-
-        ul#todoList li {
-            background: #ddd;
-            padding: 5px 15px;
-            border-radius: 3px;
-            margin-bottom: 5px;
-        }
-
-        ul#todoList li:hover {
-            background: #d6d8d6;
-        }
-    </style>
   </head>
   <body>
 
@@ -42,15 +21,19 @@
                     </div>
                     <div class="card-body">
                         <div class="input-group">
-                            <input type="text" class="form-control" id="item">
-                            <div class="input-group-prepend">
-                                <button onclick="storeItem()" class="btn btn-outline-success">Add To TodoList</button>
+                            <input type="text" class="form-control" id="item" placeholder="Input Item">
+                            <input type="hidden" id="updateId">
+                            <div class="input-group-prepend" id="saveItem">
+                                <button onclick="storeItem()" class="btn btn-outline-success">Add TodoList</button>
+                            </div>
+                            <div class="input-group-prepend" id="updateItem" style="display: none;">
+                                <button onclick="updateItem()" class="btn btn-outline-success">Update TodoList</button>
                             </div>
                         </div>
                         <small id="errorMsg" class="form-text text-danger"></small>
                     </div>
                     <div class="card-body">
-                        <ul id="todoList"></ul>
+                        <table class="table table-striped" id="todoListTable"></table>
                     </div>
                 </div>
             </div>
@@ -63,57 +46,103 @@
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     
     <script type="text/javascript">
-
-        var i;
-        
-        var NodeList = document.getElementsByTagName('li');
-        for(i=0; i<NodeList.length; i++){
-            var span = document.createElement("span");
-            var text = document.createTextNode("\u00D7");
-            span.className = "close";
-            span.appendChild(text);
-            NodeList[i].appendChild(span);
-        }
-
-        var closeBtn = document.getElementsByClassName("close");
-        for (i = 0; i < closeBtn.length; i++) {
-            closeBtn[i].onclick = function() {
-                var span = this.parentElement;
-                span.style.display = "none";
-            }
-        }
-        
+        showTodo();
+        // var selectedItem = document.querySelector(".selected-item");
+        // selectedItem.addEventListener('click', function(e){
+        //     var i;
+        //     for(i=0; i<selectedItem.langth; i++){
+        //         selectedItem[i].style.background = "#000"
+                
+        //     }
+        // })
         function storeItem(){
-            //empty validation
-            if(item == ""){
+            var item = document.getElementById('item').value;
+            if(item != ""){
+                var todoList = localStorage.getItem('todo_list');
+                if(todoList == null){
+                    todoObj = []
+                }
+                else{
+                    todoObj = JSON.parse(todoList);
+                }
+                todoObj.push(item);
+                localStorage.setItem('todo_list', JSON.stringify(todoObj))
+                showTodo();
+                document.getElementById('item').value = "";
+            }
+            else{
                 document.getElementById("errorMsg").innerHTML = "Please fill out the input box"
             }
             
-            else{
-                //create li and append text
-                var newLi = document.createElement("li");
-                var item = document.getElementById('item').value;
-                var txt = document.createTextNode(item);
-                newLi.appendChild(txt);
-                //appendchild li in todolist ul
-                document.getElementById("todoList").appendChild(newLi);
-                document.getElementById('item').value = ""
-
-                //add close button new appended li
-                var span = document.createElement("span");
-                var text = document.createTextNode("\u00D7");
-                span.className = "close";
-                span.appendChild(text)
-                newLi.appendChild(span);
-                for(i=0; i<closeBtn.length; i++){
-                    closeBtn[i].onclick = function() {
-                        var span = this.parentElement;
-                        span.style.display = "none";
-                    }
-                }
-            }
-            
         }
+
+        function showTodo(){
+            var todoListTable =document.getElementById('todoListTable');
+
+            var todoList = localStorage.getItem('todo_list');
+            if(todoList == null){
+                todoObj = []
+            }
+            else{
+                todoObj = JSON.parse(todoList);
+            }
+            var html = "";
+            todoObj.forEach((todoItem,index) =>{
+                html += `<tr>
+                            <td>${index+1}</td>
+                            <td><span class="selected-item">${todoItem}</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-info" onclick="editItem(${index})">Edit</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(${index})">Delete</button>
+                                </div>
+                            </td>
+                        </tr>`
+            })
+            todoListTable.innerHTML = html;
+        }
+        function editItem(index){
+            var updateId = document.getElementById('updateId'),
+                saveItem = document.getElementById('saveItem'),
+                updateItem = document.getElementById('updateItem'),
+                todoList = localStorage.getItem('todo_list'),
+                todoObj = JSON.parse(todoList);
+
+            item.value = todoObj[index];
+            saveItem.style.display = "none";
+            updateItem.style.display = "block";
+            updateId.value = index
+        }
+
+        function updateItem(){
+            var saveItem = document.getElementById('saveItem'),
+                updateItem = document.getElementById('updateItem'),
+                updateId = document.getElementById('updateId').value,
+                todoList = localStorage.getItem('todo_list');
+
+            todoObj = JSON.parse(todoList);
+            todoObj[updateId] = item.value;
+            localStorage.setItem('todo_list', JSON.stringify(todoObj))
+            //alert(updateId)
+            saveItem.style.display = "block";
+            updateItem.style.display = "none";
+            showTodo();
+            document.getElementById('item').value = "";
+        }
+
+        function deleteItem(index){
+            var todoList = localStorage.getItem('todo_list');
+            todoObj = JSON.parse(todoList);
+            todoObj.splice(index,1);
+            localStorage.setItem('todo_list', JSON.stringify(todoObj));
+            showTodo();
+        }
+
+        // var todoMarkBtn = document.getElementById('todoMark');
+        // todoMarkBtn.addEventListener("click",function(){
+        //     alert('click')
+        // })
+        
         
     </script>
   </body>

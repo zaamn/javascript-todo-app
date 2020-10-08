@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <title>Hello, world!</title>
+    <style>
+        .close{
+            cursor: pointer;
+        }
+        ul#todoList {
+            list-style: none;
+            margin: 0px;
+            padding: 0;
+        }
+
+        ul#todoList li {
+            background: #ddd;
+            padding: 5px 15px;
+            border-radius: 3px;
+            margin-bottom: 5px;
+        }
+
+        ul#todoList li:hover {
+            background: #d6d8d6;
+        }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2 mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        Todo List
+                    </div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="item">
+                            <div class="input-group-prepend">
+                                <button onclick="storeItem()" class="btn btn-outline-success">Add To TodoList</button>
+                            </div>
+                        </div>
+                        <small id="errorMsg" class="form-text text-danger"></small>
+                    </div>
+                    <div class="card-body">
+                        <ul id="todoList"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
+    <script type="text/javascript">
+
+        var i;
+        
+        var NodeList = document.getElementsByTagName('li');
+        for(i=0; i<NodeList.length; i++){
+            var span = document.createElement("span");
+            var text = document.createTextNode("\u00D7");
+            span.className = "close";
+            span.appendChild(text);
+            NodeList[i].appendChild(span);
+        }
+
+        var closeBtn = document.getElementsByClassName("close");
+        for (i = 0; i < closeBtn.length; i++) {
+            closeBtn[i].onclick = function() {
+                var span = this.parentElement;
+                span.style.display = "none";
+            }
+        }
+        
+        function storeItem(){
+            //empty validation
+            if(item == ""){
+                document.getElementById("errorMsg").innerHTML = "Please fill out the input box"
+            }
+            
+            else{
+                //create li and append text
+                var newLi = document.createElement("li");
+                var item = document.getElementById('item').value;
+                var txt = document.createTextNode(item);
+                newLi.appendChild(txt);
+                //appendchild li in todolist ul
+                document.getElementById("todoList").appendChild(newLi);
+                document.getElementById('item').value = ""
+
+                //add close button new appended li
+                var span = document.createElement("span");
+                var text = document.createTextNode("\u00D7");
+                span.className = "close";
+                span.appendChild(text)
+                newLi.appendChild(span);
+                for(i=0; i<closeBtn.length; i++){
+                    closeBtn[i].onclick = function() {
+                        var span = this.parentElement;
+                        span.style.display = "none";
+                    }
+                }
+            }
+            
+        }
+        
+    </script>
+  </body>
+</html>
